@@ -1,4 +1,4 @@
-FROM bitnami/minideb:latest
+FROM bitnami/minideb:trixie
 
 LABEL name="DockerPress for Coolify"
 LABEL version="1.2.6"
