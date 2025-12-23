@@ -66,7 +66,7 @@ RUN install_packages \
 	"curl" \
 	"gnupg"
 
-RUN wget -O - https://repo.litespeed.sh | bash
+RUN wget -O - https://get.litespeed.sh | bash
 
 RUN apt update
 
