@@ -64,7 +64,8 @@ RUN apt-get update \
 # Make sure we have required tools
 RUN install_packages \
 	"curl" \
-	"gnupg"
+	"gnupg" \
+	"ca-certificates"
 
 RUN wget -O - https://repo.litespeed.sh | bash
 
