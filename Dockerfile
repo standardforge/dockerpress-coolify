@@ -64,7 +64,10 @@ RUN apt-get update \
 # Make sure we have required tools
 RUN install_packages \
 	"curl" \
-	"gnupg" \
+	"gnupg"
+
+# Install the certificates
+RUN install_packages \
 	"ca-certificates"
 
 RUN wget -O - https://repo.litespeed.sh | bash
@@ -112,10 +115,6 @@ RUN ln --symbolic --force \
 RUN ln --symbolic --force \
     "/usr/local/lsws/lsphp${PHP_PKG}/bin/php${PHP_VER}" \
     "/usr/bin/php"
-
-# Install the certificates
-RUN install_packages \
-	"ca-certificates"
 
 # Install requirements
 RUN install_packages \
