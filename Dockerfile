@@ -68,7 +68,7 @@ RUN install_packages \
 
 RUN wget -O - https://get.litespeed.sh | bash
 
-RUN apt update
+RUN apt-get update
 
 # Install the Litespeed
 RUN install_packages \
