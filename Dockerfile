@@ -91,7 +91,6 @@ RUN install_packages \
 	"lsphp${PHP_PKG}-curl" \
 	"lsphp${PHP_PKG}-igbinary" \
 	"lsphp${PHP_PKG}-imagick" \
-	"lsphp${PHP_PKG}-imap" \
 	"lsphp${PHP_PKG}-intl" \
 	"lsphp${PHP_PKG}-ldap" \
 	"lsphp${PHP_PKG}-memcached" \
