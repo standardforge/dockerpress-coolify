@@ -11,17 +11,17 @@ ARG PHP_VER=8.4
 ARG PHP_PKG=84
 
 # ENV Defaults
-ENV WP_CLI_CACHE_DIR "/var/www/.wp-cli/cache/"
-	WP_CLI_PACKAGES_DIR "/var/www/.wp-cli/packages/"
-	ADMIN_EMAIL "webmaster@standardforge.com"
-	ADMIN_PASS "DP4CAdmin"
-	ADMIN_USER "d0c<3r9rE5S"
-	WP_LOCALE "en_US"
-	WP_DEBUG false
-	WORDPRESS_DB_PREFIX "wp_"
-	WORDPRESS_DB_PORT 3306
-	APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE="1"
-	DEBIAN_FRONTEND="noninteractive"
+ENV WP_CLI_CACHE_DIR "/var/www/.wp-cli/cache/" \
+	WP_CLI_PACKAGES_DIR "/var/www/.wp-cli/packages/" \
+	ADMIN_EMAIL "webmaster@standardforge.com" \
+	ADMIN_PASS "DP4CAdmin" \
+	ADMIN_USER "d0c<3r9rE5S" \
+	WP_LOCALE "en_US" \
+	WP_DEBUG false \
+	WORDPRESS_DB_PREFIX "wp_" \
+	WORDPRESS_DB_PORT 3306 \
+	APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE="1" \
+	DEBIAN_FRONTEND="noninteractive" \
 	DISABLE_WP_CRON=true
 
 # HTTP port
