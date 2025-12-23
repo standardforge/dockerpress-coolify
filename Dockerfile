@@ -12,17 +12,17 @@ ARG PHP_PKG=84
 
 # ENV Defaults
 ENV WP_CLI_CACHE_DIR "/var/www/.wp-cli/cache/"
-ENV WP_CLI_PACKAGES_DIR "/var/www/.wp-cli/packages/"
-ENV ADMIN_EMAIL "webmaster@standardforge.com"
-ENV ADMIN_PASS "DP4CAdmin"
-ENV ADMIN_USER "d0c<3r9rE5S"
-ENV WP_LOCALE "en_US"
-ENV WP_DEBUG false
-ENV WORDPRESS_DB_PREFIX "wp_"
-ENV WORDPRESS_DB_PORT 3306
-ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE="1"
-ENV DEBIAN_FRONTEND="noninteractive"
-ENV DISABLE_WP_CRON=true
+	WP_CLI_PACKAGES_DIR "/var/www/.wp-cli/packages/"
+	ADMIN_EMAIL "webmaster@standardforge.com"
+	ADMIN_PASS "DP4CAdmin"
+	ADMIN_USER "d0c<3r9rE5S"
+	WP_LOCALE "en_US"
+	WP_DEBUG false
+	WORDPRESS_DB_PREFIX "wp_"
+	WORDPRESS_DB_PORT 3306
+	APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE="1"
+	DEBIAN_FRONTEND="noninteractive"
+	DISABLE_WP_CRON=true
 
 # HTTP port
 EXPOSE "80/tcp"
