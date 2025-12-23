@@ -7,8 +7,8 @@ LABEL release="2025-12-22"
 WORKDIR /var/www/html
 
 # Define PHP version
-ARG PHP_VER=8.3
-ARG PHP_PKG=83
+ARG PHP_VER=8.4
+ARG PHP_PKG=84
 
 # ENV Defaults
 ENV WP_CLI_CACHE_DIR "/var/www/.wp-cli/cache/"
@@ -68,7 +68,7 @@ RUN install_packages \
 
 RUN wget -O - https://repo.litespeed.sh | bash
 
-RUN apt-get update
+RUN apt update
 
 # Install the Litespeed
 RUN install_packages \
