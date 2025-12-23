@@ -66,16 +66,7 @@ RUN install_packages \
 	"curl" \
 	"gnupg"
 
-RUN wget -O - http://rpms.litespeedtech.com/debian/enable_lst_debian_repo.sh | bash
-
-# Install the Litespeed keys
-RUN curl --silent --show-error \
-	"http://rpms.litespeedtech.com/debian/lst_debian_repo.gpg" |\
-	apt-key add -
-
-RUN curl --silent --show-error \
-	"http://rpms.litespeedtech.com/debian/lst_repo.gpg" |\
-	apt-key add -
+RUN wget -O - https://repo.litespeed.sh | bash
 
 RUN apt-get update
 
