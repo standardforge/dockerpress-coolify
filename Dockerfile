@@ -1,8 +1,8 @@
 FROM bitnami/minideb:latest
 
 LABEL name="DockerPress for Coolify"
-LABEL version="1.2.5"
-LABEL release="2025-07-28"
+LABEL version="1.2.6"
+LABEL release="2025-12-22"
 
 WORKDIR /var/www/html
 
