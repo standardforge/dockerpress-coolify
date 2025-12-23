@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  dockerpress:
+    build:
+      context: .  # Builds from the current directory using your Dockerfile
+    ports:
+      - "80:80"  # Expose OpenLiteSpeed/WordPress (adjust if needed)
+    environment:
+      - WORDPRESS_DB_HOST  # Required; user sets in UI
+      - WORDPRESS_DB_PORT=3306
+      - WORDPRESS_DB_NAME
+      - WORDPRESS_DB_USER
+      - WORDPRESS_DB_PASSWORD
+      - COOLIFY_FQDN  # Auto-injected by Coolify for domain/routing
+      - ADMIN_USER=DP4CAdmin
+      - ADMIN_EMAIL
+      - WP_LOCALE=en_US
+      - WP_DEBUG=false
+      - WP_MULTISITE=FALSE  # Pre-populates as FALSE; user can override to TRUE
+    # Optional: Add healthcheck here if not in Dockerfile
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    # Volumes for persistence (e.g., WordPress files, if not already handled)
+    volumes:
+      - wp-data:/var/www/html
+volumes:
+  wp-data:
