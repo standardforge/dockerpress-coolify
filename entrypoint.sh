@@ -32,15 +32,25 @@ function generate_litespeed_password() {
   fi
 }
 
-function setup_mysql_client() {
-  echo "Updating my.cnf ..."
-  mv /root/.my.cnf.sample /root/.my.cnf
-  sed -i -e "s/MYUSER/$WORDPRESS_DB_USER/g" /root/.my.cnf
-  sed -i -e "s/MYPASSWORD/$WORDPRESS_DB_PASSWORD/g" /root/.my.cnf
-  sed -i -e "s/MYHOST/$WORDPRESS_DB_HOST/g" /root/.my.cnf
-  sed -i -e "s/MYDATABASE/$WORDPRESS_DB_NAME/g" /root/.my.cnf
-  sed -i -e "s/MYPORT/$WORDPRESS_DB_PORT/g" /root/.my.cnf
-}
+# Create .my.cnf from env vars (fail if any var is unset)
+: "${WORDPRESS_DB_USER?Missing required env var WORDPRESS_DB_USER}"
+: "${WORDPRESS_DB_PASSWORD?Missing required env var WORDPRESS_DB_PASSWORD}"
+: "${WORDPRESS_DB_HOST?Missing required env var WORDPRESS_DB_HOST}"
+: "${WORDPRESS_DB_PORT?Missing required env var WORDPRESS_DB_PORT}"
+: "${WORDPRESS_DB_NAME?Missing required env var WORDPRESS_DB_NAME}"
+
+cat <<EOF > /root/.my.cnf
+[client]
+user=$WORDPRESS_DB_USER
+password='$WORDPRESS_DB_PASSWORD'
+host=$WORDPRESS_DB_HOST
+port=$WORDPRESS_DB_PORT
+
+[mysql]
+database=$WORDPRESS_DB_NAME
+EOF
+
+chmod 600 /root/.my.cnf  # Secure permissions
 
 function install_wp_cli() {
   echo "Setting up wp-cli..."
@@ -160,9 +170,6 @@ cd /var/www/html
 generate_litespeed_password
 
 trap finish SIGTERM
-
-#### Setting Up MySQL Client Defaults
-setup_mysql_client
 
 #### Setup wp-cli
 install_wp_cli
