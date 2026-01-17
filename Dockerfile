@@ -11,24 +11,18 @@ ARG PHP_VER=8.4
 ARG PHP_PKG=84
 
 # ENV Defaults
-ENV WP_CLI_CACHE_DIR "/var/www/.wp-cli/cache/" \
-	WP_CLI_PACKAGES_DIR "/var/www/.wp-cli/packages/" \
-	ADMIN_EMAIL "webmaster@standardforge.com" \
-	ADMIN_PASS "DP4CAdmin" \
-	ADMIN_USER "d0c<3r9rE5S" \
-	WP_LOCALE "en_US" \
-	WP_DEBUG false \
-	WORDPRESS_DB_PREFIX "wp_" \
-	WORDPRESS_DB_PORT 3306 \
+ENV WP_CLI_CACHE_DIR="/var/www/.wp-cli/cache/" \
+	WP_CLI_PACKAGES_DIR="/var/www/.wp-cli/packages/" \
+	ADMIN_EMAIL="webmaster@standardforge.com" \
+	ADMIN_PASS="DP4CAdmin" \
+	ADMIN_USER="d0c<3r9rE5S" \
+	WP_LOCALE="en_US" \
+	WP_DEBUG=false \
+	WORDPRESS_DB_PREFIX="wp_" \
+	WORDPRESS_DB_PORT=3306 \
 	APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE="1" \
 	DEBIAN_FRONTEND="noninteractive" \
 	DISABLE_WP_CRON=true
-
-# HTTP port
-EXPOSE "80/tcp"
-
-# Webadmin port (HTTPS)
-EXPOSE "7080/tcp"
 
 # Install System Libraries
 RUN apt-get update \
@@ -220,13 +214,18 @@ RUN chmod 644 /etc/cron.d/dockerpress
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Default Port for Apache
-EXPOSE 80
-
 # Set the workdir and command
 ENV PATH="/usr/local/lsws/bin:${PATH}"
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f http://127.0.0.1:80/ || exit 1
+# REMOVED DUPLICATE EXPOSE - Only expose port 80 for HTTP
+EXPOSE 80
+
+# REMOVED: Old EXPOSE lines that were duplicated
+# Keep admin port separate if needed
+EXPOSE 7080
+
+# Improved healthcheck - checks localhost via HTTP
+HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=5 \
+  CMD curl -f http://localhost:80/ || exit 1
 
 ENTRYPOINT ["entrypoint.sh"]
