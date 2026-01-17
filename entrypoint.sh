@@ -189,10 +189,6 @@ trap finish SIGTERM SIGINT
 
 cd /var/www/html
 
-# Ensure proper permissions on LiteSpeed directories
-chown -R lsadm:lsadm /usr/local/lsws/conf /tmp/lshttpd /var/log/litespeed
-chown -R www-data:www-data /var/www
-
 echo "=== Starting DockerPress Setup ==="
 
 # Generate litespeed Admin Password
@@ -210,23 +206,77 @@ service cron start || service cron reload
 # Setting up MySQL Optimize
 setup_mysql_optimize
 
-# Creating WordPress Database
-create_wordpress_database
+# Start memcache service (before WordPress needs it)
+service memcached start
+
+# Creating WordPress Database - WITH BETTER ERROR HANDLING
+echo "Waiting for database connection..."
+if ! create_wordpress_database; then
+    echo "ERROR: Could not connect to database!"
+    echo "DB_HOST: $WORDPRESS_DB_HOST"
+    echo "DB_PORT: $WORDPRESS_DB_PORT"
+    echo "DB_NAME: $WORDPRESS_DB_NAME"
+    echo "DB_USER: $WORDPRESS_DB_USER"
+    echo "Starting OpenLiteSpeed anyway so container doesn't crash..."
+    
+    # Start OpenLiteSpeed even without DB
+    /usr/local/lsws/bin/lswsctrl start
+    sleep 2
+    sysvbanner dockerpress
+    cat '/usr/local/lsws/adminpasswd' 2>/dev/null || echo "Admin password not set"
+    
+    echo "Container is running but WordPress needs database connection."
+    echo "Check your database settings and restart the container."
+    tail -f /var/log/litespeed/error.log /var/log/litespeed/access.log &
+    wait
+    exit 0
+fi
+
+# Check if this is first run or update
+FIRST_RUN=false
+if [ ! -e /var/www/html/wp-config.php ]; then
+    FIRST_RUN=true
+    echo "First run detected - will perform full WordPress installation"
+else
+    echo "Existing installation detected - updating configuration only"
+fi
 
 # Run WordPress installer
-install_wordpress
+echo "Installing/Updating WordPress..."
+if ! install_wordpress; then
+    echo "ERROR: WordPress installation failed!"
+    cat /var/www/html/wp-config.php || echo "No wp-config.php found"
+fi
 
-# Install and activate default plugins
-install_dockerpress_plugins
+# Only install plugins on first run or if explicitly requested
+if [ "$FIRST_RUN" = true ] || [ "${FORCE_PLUGIN_INSTALL:-false}" = "true" ]; then
+    echo "Installing default plugins..."
+    install_dockerpress_plugins
+else
+    echo "Skipping plugin installation (not first run)"
+fi
 
 # Update file permissions
+echo "Setting permissions..."
 chown -R www-data:www-data /var/www/html
+chmod -R 755 /var/www/html
+chmod 644 /var/www/html/wp-config.php
 
 # Verify WordPress
-wp core verify-checksums --allow-root || true
+wp core verify-checksums --allow-root || echo "Warning: Checksum verification failed"
 
-# Start memcache service
-service memcached start
+# Test database connection one more time
+if wp db check --allow-root; then
+    echo "✓ Database connection verified"
+else
+    echo "✗ WARNING: Database connection test failed"
+fi
+
+# Ensure proper permissions on LiteSpeed directories
+echo "Setting LiteSpeed permissions..."
+chown -R lsadm:lsadm /usr/local/lsws/conf /tmp/lshttpd /var/log/litespeed
+chmod -R 755 /tmp/lshttpd
+chmod -R 755 /var/log/litespeed
 
 # Welcome banner
 sysvbanner dockerpress
@@ -239,7 +289,7 @@ echo "=== Starting OpenLiteSpeed ==="
 # Start OpenLiteSpeed
 /usr/local/lsws/bin/lswsctrl start
 
-# Wait for it to start
+# Wait for it to actually start
 sleep 5
 
 # Verify it's running
@@ -254,7 +304,22 @@ echo "OpenLiteSpeed started successfully on port 80"
 echo "Listening on: *:80"
 echo "Document root: /var/www/html"
 
+# Test that WordPress responds (internal test)
+echo "Testing WordPress..."
+sleep 2
+RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/)
+if [ "$RESPONSE" = "200" ] || [ "$RESPONSE" = "301" ] || [ "$RESPONSE" = "302" ]; then
+    echo "✓ WordPress is responding (HTTP $RESPONSE)"
+else
+    echo "✗ WordPress returned HTTP $RESPONSE"
+    if [ "$RESPONSE" = "500" ]; then
+        echo "This usually means database connection issues."
+        echo "Check your database credentials and ensure the database is running."
+    fi
+fi
+
 # Tail logs (keeps container running)
+echo "Container ready - tailing logs..."
 tail -f /var/log/litespeed/error.log /var/log/litespeed/access.log &
 
 # Wait for signals
