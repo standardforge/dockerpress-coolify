@@ -13,6 +13,7 @@ services:
       - WORDPRESS_DB_PASSWORD
       - ADMIN_USER=DP4CAdmin
       - ADMIN_EMAIL
+      - COOLIFY_FDQN
       - WP_LOCALE=en_US
       - WP_DEBUG=false
       - WP_MULTISITE=FALSE  # Pre-populates as FALSE; user can override to TRUE
