@@ -3,8 +3,8 @@ services:
   dockerpress:
     build:
       context: .  # Builds from the current directory using your Dockerfile
-    #ports:  # Comment out or remove this line and the mapping below
-      #- "80:80"  # Expose OpenLiteSpeed/WordPress (adjust if needed)
+    ports:  # Comment out or remove this line and the mapping below
+      - "80:80"  # Expose OpenLiteSpeed/WordPress (adjust if needed)
     environment:
       - WORDPRESS_DB_HOST  # Required; user sets in UI
       - WORDPRESS_DB_PORT=3306
@@ -17,8 +17,8 @@ services:
       - WP_LOCALE=en_US
       - WP_DEBUG=false
       - WP_MULTISITE=FALSE  # Pre-populates as FALSE; user can override to TRUE
-    labels:
-      - "traefik.http.services.dockerpress.loadbalancer.server.port=80"  # Add this line
+    #labels:
+    #  - "traefik.http.services.dockerpress.loadbalancer.server.port=80"  # Add this line
     # Optional: Add healthcheck here if not in Dockerfile
     #healthcheck:
     #  test:
