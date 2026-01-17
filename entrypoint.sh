@@ -18,9 +18,12 @@ function update_wp_config() {
   wp config set DB_NAME "$WORDPRESS_DB_NAME" --add --type=constant --allow-root
   wp config set DB_USER "$WORDPRESS_DB_USER" --add --type=constant --allow-root
   wp config set DB_PASSWORD "$WORDPRESS_DB_PASSWORD" --add --type=constant --allow-root
-  wp config set DB_HOST "$WORDPRESS_DB_HOST:$WORDPRESS_DB_PORT" --add --type=constant --allow-root
-  wp config set DB_PREFIX "$WORDPRESS_DB_PREFIX" --add --type=constant --allow-root
+
+  # Option 1: Just hostname in DB_HOST, use DB_PORT separately (RECOMMENDED)
+  wp config set DB_HOST "$WORDPRESS_DB_HOST" --add --type=constant --allow-root
   wp config set DB_PORT "$WORDPRESS_DB_PORT" --raw --add --type=constant --allow-root
+
+  wp config set DB_PREFIX "$WORDPRESS_DB_PREFIX" --add --type=constant --allow-root
   wp config set WP_DEBUG "$WP_DEBUG" --raw --add --type=constant --allow-root
   wp config set WP_MEMORY_LIMIT 512M --add --type=constant --allow-root
   wp config set WP_MAX_MEMORY_LIMIT 512M --add --type=constant --allow-root
