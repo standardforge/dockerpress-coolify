@@ -17,8 +17,8 @@ useIpInProxyHeader        3
 adminEmails               root@localhost
 
 errorlog /var/log/litespeed/error.log {
-  logLevel                DEBUG
-  debugLevel              10
+  logLevel                NOTICE
+  debugLevel              0
   rollingSize             10M
   enableStderrLog         1
 }
