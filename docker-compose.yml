@@ -20,15 +20,13 @@ services:
       - WP_MULTISITE=FALSE  # Pre-populates as FALSE; user can override to TRUE
     networks:
       - coolify
-    expose:
-      - "80"  # Expose port internally to the Docker network
     # Optional: Add healthcheck here if not in Dockerfile
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:80/ -o /dev/null -s"]
       interval: 15s
       timeout: 10s
-      retries: 5
-      start_period: 90s
+      retries: 10
+      start_period: 120s
     # Volumes for persistence (e.g., WordPress files, if not already handled)
     volumes:
       - wp-data:/var/www/html
