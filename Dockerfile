@@ -225,7 +225,7 @@ EXPOSE "80/tcp"
 EXPOSE "7080/tcp"
 
 # Improved healthcheck - checks localhost via HTTP
-HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=5 \
-  CMD curl -f http://localhost:80/ || exit 1
+#HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=5 \
+#  CMD curl -f http://localhost:80/ || exit 1
 
 ENTRYPOINT ["entrypoint.sh"]
