@@ -18,8 +18,15 @@ services:
       - WP_LOCALE=en_US
       - WP_DEBUG=false
       - WP_MULTISITE=FALSE  # Pre-populates as FALSE; user can override to TRUE
+    labels:
+      # These labels tell Coolify/Traefik how to route
+      - "coolify.managed=true"
+      # This is the critical one - tells Coolify this is the main service
+      - "coolify.name=dockerpress"
     networks:
       - coolify
+    ports:
+      - "80"  # Change from expose to ports
     # Optional: Add healthcheck here if not in Dockerfile
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/ -o /dev/null -s"]
