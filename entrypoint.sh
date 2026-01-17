@@ -10,8 +10,8 @@ function finish() {
 
 function update_wp_config() {
   echo "Updating wp-config.php ..."
-  wp config set WP_SITEURL "https://$COOLIFY_URL" --add --type=constant
-  wp config set WP_HOME "https://$COOLIFY_URL" --add --type=constant
+  wp config set WP_SITEURL "https://$COOLIFY_FQDN" --add --type=constant
+  wp config set WP_HOME "https://$COOLIFY_FQDN" --add --type=constant
   wp config set DB_NAME $WORDPRESS_DB_NAME --add --type=constant
   wp config set DB_USER $WORDPRESS_DB_USER --add --type=constant
   wp config set DB_PASSWORD $WORDPRESS_DB_PASSWORD --add --type=constant
@@ -95,12 +95,12 @@ function install_wordpress() {
 
     # if Wordpress is installed
     if ! $(wp core is-installed); then
-      echo "Installing Wordpress for $COOLIFY_URL ..."
+      echo "Installing Wordpress for $COOLIFY_FQDN ..."
       if [ "${WP_MULTISITE:-false}" = "true" ]; then
         echo "define('WP_ALLOW_MULTISITE', true);" >> /var/www/html/wp-config.php
-        wp core multisite-install --url="$COOLIFY_URL" --title="WordPress" --admin_user="$ADMIN_USER" --admin_password="$ADMIN_PASS" --admin_email="$ADMIN_EMAIL" --subdomains="${WP_SUBDOMAINS:-false}" --skip-email --path=/var/www/html
+        wp core multisite-install --url="$COOLIFY_FQDN" --title="WordPress" --admin_user="$ADMIN_USER" --admin_password="$ADMIN_PASS" --admin_email="$ADMIN_EMAIL" --subdomains="${WP_SUBDOMAINS:-false}" --skip-email --path=/var/www/html
       else
-        wp core install --url="$COOLIFY_URL" \
+        wp core install --url="$COOLIFY_FQDN" \
           --title="WordPress" \
           --admin_user="$ADMIN_USER" \
           --admin_password="$ADMIN_PASS" \
