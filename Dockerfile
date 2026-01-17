@@ -216,18 +216,6 @@ RUN chmod +x /usr/local/bin/wpcli-run-schedule
 COPY cron.d/dockerpress.crontab /etc/cron.d/dockerpress
 RUN chmod 644 /etc/cron.d/dockerpress
 
-RUN { \
-	echo '[client]'; \
-	echo 'user=MYUSER'; \
-	echo "password='MYPASSWORD'"; \
-	echo 'host=MYHOST'; \
-	echo 'port=MYPORT'; \
-	echo ''; \
-	echo '[mysql]'; \
-	echo 'database=MYDATABASE'; \
-	echo ''; \
-	} > /root/.my.cnf.sample
-
 # Running wordpress startup scripts
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
