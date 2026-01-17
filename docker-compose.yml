@@ -17,6 +17,8 @@ services:
       - WP_LOCALE=en_US
       - WP_DEBUG=false
       - WP_MULTISITE=FALSE  # Pre-populates as FALSE; user can override to TRUE
+    labels:
+      - "traefik.http.services.dockerpress.loadbalancer.server.port=80"  # Add this line
     # Optional: Add healthcheck here if not in Dockerfile
     #healthcheck:
     #  test:
