@@ -10,18 +10,18 @@ function finish() {
 
 function update_wp_config() {
   echo "Updating wp-config.php ..."
-  wp config set WP_SITEURL "$COOLIFY_URL" --type=constant
-  wp config set WP_HOME "$COOLIFY_URL" --type=constant
-  wp config set DB_NAME $WORDPRESS_DB_NAME --type=constant
-  wp config set DB_USER $WORDPRESS_DB_USER --type=constant
-  wp config set DB_PASSWORD $WORDPRESS_DB_PASSWORD --type=constant
-  wp config set DB_HOST "$WORDPRESS_DB_HOST" --type=constant
-  wp config set DB_PREFIX $WORDPRESS_DB_PREFIX --type=constant
-  wp config set DB_PORT $WORDPRESS_DB_PORT --raw --type=constant
-  wp config set WP_DEBUG $WP_DEBUG --raw --type=constant
-  wp config set WP_MEMORY_LIMIT 512M --type=constant
-  wp config set WP_MAX_MEMORY_LIMIT 512M --type=constant
-  wp config set DISABLE_WP_CRON $DISABLE_WP_CRON --raw --type=constant
+  wp config set WP_SITEURL "$COOLIFY_URL" --add --type=constant
+  wp config set WP_HOME "$COOLIFY_URL" --add --type=constant
+  wp config set DB_NAME $WORDPRESS_DB_NAME --add --type=constant
+  wp config set DB_USER $WORDPRESS_DB_USER --add --type=constant
+  wp config set DB_PASSWORD $WORDPRESS_DB_PASSWORD --add --type=constant
+  wp config set DB_HOST "$WORDPRESS_DB_HOST:$WORDPRESS_DB_PORT" --add --type=constant
+  wp config set DB_PREFIX $WORDPRESS_DB_PREFIX --add --type=constant
+  wp config set DB_PORT $WORDPRESS_DB_PORT --raw --add --type=constant
+  wp config set WP_DEBUG $WP_DEBUG --raw --add --type=constant
+  wp config set WP_MEMORY_LIMIT 512M --add --type=constant
+  wp config set WP_MAX_MEMORY_LIMIT 512M --add --type=constant
+  wp config set DISABLE_WP_CRON $DISABLE_WP_CRON --raw --add --type=constant
 }
 
 function generate_litespeed_password() {
@@ -32,59 +32,39 @@ function generate_litespeed_password() {
   fi
 }
 
-# Create .my.cnf from env vars (fail if any var is unset)
-: "${WORDPRESS_DB_USER?Missing required env var WORDPRESS_DB_USER}"
-: "${WORDPRESS_DB_PASSWORD?Missing required env var WORDPRESS_DB_PASSWORD}"
-: "${WORDPRESS_DB_HOST?Missing required env var WORDPRESS_DB_HOST}"
-: "${WORDPRESS_DB_PORT?Missing required env var WORDPRESS_DB_PORT}"
-: "${WORDPRESS_DB_NAME?Missing required env var WORDPRESS_DB_NAME}"
-
-cat <<EOF > /root/.my.cnf
-[client]
-user=$WORDPRESS_DB_USER
-password='$WORDPRESS_DB_PASSWORD'
-host=$WORDPRESS_DB_HOST
-port=$WORDPRESS_DB_PORT
-
-[mysql]
-database=$WORDPRESS_DB_NAME
-EOF
-
-chmod 600 /root/.my.cnf  # Secure permissions
+function setup_mysql_client() {
+  echo "Updating my.cnf ..."
+  mv /root/.my.cnf.sample /root/.my.cnf
+  sed -i -e "s/MYUSER/$WORDPRESS_DB_USER/g" /root/.my.cnf
+  sed -i -e "s/MYPASSWORD/$WORDPRESS_DB_PASSWORD/g" /root/.my.cnf
+  sed -i -e "s/MYHOST/$WORDPRESS_DB_HOST/g" /root/.my.cnf
+  sed -i -e "s/MYDATABASE/$WORDPRESS_DB_NAME/g" /root/.my.cnf
+  sed -i -e "s/MYPORT/$WORDPRESS_DB_PORT/g" /root/.my.cnf
+}
 
 function install_wp_cli() {
   echo "Setting up wp-cli..."
   rm -rf /var/www/.wp-cli/
-  WP_CLI_CACHE_DIR="${WP_CLI_CACHE_DIR:-/var/www/.wp-cli/cache/}"
-  mkdir -p "$WP_CLI_CACHE_DIR"
-  chown -R www-data:www-data "$WP_CLI_CACHE_DIR"
-  WP_CLI_PACKAGES_DIR="${WP_CLI_PACKAGES_DIR:-/var/www/.wp-cli/packages/}"
-  rm -rf "$WP_CLI_PACKAGES_DIR"
-  mkdir -p "$WP_CLI_PACKAGES_DIR"
-  chown -R www-data:www-data "$WP_CLI_PACKAGES_DIR"
+  mkdir -p $WP_CLI_CACHE_DIR
+  chown -R www-data:www-data $WP_CLI_CACHE_DIR
+  rm -rf $WP_CLI_PACKAGES_DIR
+  mkdir -p $WP_CLI_PACKAGES_DIR
+  chown -R www-data:www-data $WP_CLI_PACKAGES_DIR
   rm -f /var/www/wp-cli.phar
   curl -o /var/www/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
   chmod +x /var/www/wp-cli.phar
   rm -rf /var/www/wp-completion.bash
   curl -o /var/www/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
-  # Removed source (useless)
+  source /var/www/wp-completion.bash
 }
 
-# Replaced sed with cat (secure, no delimiter issues)
 function setup_mysql_optimize() {
   echo "Setting up MySQL Optimize..."
-  : "${WORDPRESS_DB_HOST?Missing WORDPRESS_DB_HOST}"
-  : "${WORDPRESS_DB_USER?Missing WORDPRESS_DB_USER}"
-  : "${WORDPRESS_DB_PASSWORD?Missing WORDPRESS_DB_PASSWORD}"
-  : "${WORDPRESS_DB_NAME?Missing WORDPRESS_DB_NAME}"
-  : "${WORDPRESS_DB_PORT?Missing WORDPRESS_DB_PORT}"
-
-  cat <<EOF > /usr/local/bin/mysql-optimize
-#!/bin/bash
-mysqlcheck -h $WORDPRESS_DB_HOST -u $WORDPRESS_DB_USER -p'$WORDPRESS_DB_PASSWORD' -P $WORDPRESS_DB_PORT --optimize $WORDPRESS_DB_NAME
-EOF
-
-  chmod +x /usr/local/bin/mysql-optimize
+  sed -i -e "s/WORDPRESS_DB_HOST/$WORDPRESS_DB_HOST/g" /usr/local/bin/mysql-optimize
+  sed -i -e "s/WORDPRESS_DB_USER/$WORDPRESS_DB_USER/g" /usr/local/bin/mysql-optimize
+  sed -i -e "s/WORDPRESS_DB_PASSWORD/$WORDPRESS_DB_PASSWORD/g" /usr/local/bin/mysql-optimize
+  sed -i -e "s/WORDPRESS_DB_NAME/$WORDPRESS_DB_NAME/g" /usr/local/bin/mysql-optimize
+  sed -i -e "s/WORDPRESS_DB_PORT/$WORDPRESS_DB_PORT/g" /usr/local/bin/mysql-optimize
 }
 
 function create_wordpress_database() {
@@ -181,6 +161,9 @@ generate_litespeed_password
 
 trap finish SIGTERM
 
+#### Setting Up MySQL Client Defaults
+setup_mysql_client
+
 #### Setup wp-cli
 install_wp_cli
 
@@ -208,6 +191,9 @@ wp core verify-checksums
 # start memcache service
 service memcached start
 
+# Start the LiteSpeed
+/usr/local/lsws/bin/litespeed
+
 # welcome to dockerpress
 sysvbanner dockerpress
 
@@ -216,9 +202,6 @@ cat '/usr/local/lsws/adminpasswd'
 
 # Tail the logs to stdout
 tail -f \
-  '/var/log/litespeed/access.log' &
-
-# Start the LiteSpeed (at end)
- /usr/local/lsws/bin/litespeed
+  '/var/log/litespeed/access.log'
 
 exec "$@"
