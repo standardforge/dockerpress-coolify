@@ -65,7 +65,7 @@ function install_wp_cli() {
   chmod +x /var/www/wp-cli.phar
   rm -rf /var/www/wp-completion.bash
   curl -o /var/www/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
-  source /var/www/wp-completion.bash
+  # Removed: source /var/www/wp-completion.bash (useless in script)
 }
 
 function setup_mysql_optimize() {
@@ -198,14 +198,14 @@ wp core verify-checksums
 # start memcache service
 service memcached start
 
-# Start the LiteSpeed
-/usr/local/lsws/bin/litespeed
-
 # welcome to dockerpress
 sysvbanner dockerpress
 
 # Read the credentials
 cat '/usr/local/lsws/adminpasswd'
+
+# Start the LiteSpeed (moved to end to avoid blocking)
+ /usr/local/lsws/bin/litespeed
 
 # Tail the logs to stdout
 tail -f \
