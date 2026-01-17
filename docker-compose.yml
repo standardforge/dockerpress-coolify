@@ -3,15 +3,15 @@ services:
   dockerpress:
     build:
       context: .  # Builds from the current directory using your Dockerfile
-    ports:
-      - "80:80"  # Expose OpenLiteSpeed/WordPress (adjust if needed)
+    #ports:  # Comment out or remove this line and the mapping below
+    #  - "80:80"  # Expose OpenLiteSpeed/WordPress (adjust if needed)
     environment:
       - WORDPRESS_DB_HOST  # Required; user sets in UI
       - WORDPRESS_DB_PORT=3306
       - WORDPRESS_DB_NAME
       - WORDPRESS_DB_USER
       - WORDPRESS_DB_PASSWORD
-      - COOLIFY_URL  # Auto-injected by Coolify for domain/routing
+      - COOLIFY_FQDN  # Auto-injected by Coolify for domain/routing
       - ADMIN_USER=DP4CAdmin
       - ADMIN_EMAIL
       - WP_LOCALE=en_US
