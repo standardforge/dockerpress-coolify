@@ -1,4 +1,4 @@
-FROM bitnami/minideb:trixie
+vFROM bitnami/minideb:trixie
 
 LABEL name="DockerPress for Coolify"
 LABEL version="1.2.6"
@@ -18,8 +18,8 @@ ENV WP_CLI_CACHE_DIR="/var/www/.wp-cli/cache/" \
 	ADMIN_USER="d0c<3r9rE5S" \
 	WP_LOCALE="en_US" \
 	WP_DEBUG=false \
-	WORDPRESS_DB_PREFIX="wp_" \
 	WORDPRESS_DB_PORT=3306 \
+	WORDPRESS_DB_PREFIX="wp_" \
 	APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE="1" \
 	DEBIAN_FRONTEND="noninteractive" \
 	DISABLE_WP_CRON=true
