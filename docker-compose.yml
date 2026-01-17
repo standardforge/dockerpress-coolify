@@ -22,11 +22,11 @@ services:
       - "80"  # Expose port internally to the Docker network
     # Optional: Add healthcheck here if not in Dockerfile
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://127.0.0.1:80 || exit 1"]
-      interval: 10s
+      test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+      interval: 15s
       timeout: 10s
       retries: 5
-      start_period: 60s
+      start_period: 90s
     # Volumes for persistence (e.g., WordPress files, if not already handled)
     volumes:
       - wp-data:/var/www/html
