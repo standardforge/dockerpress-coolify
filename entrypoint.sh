@@ -167,14 +167,21 @@ function install_wordpress() {
 }
 
 function install_dockerpress_plugins() {
+  # First verify WordPress can connect to database
+  if ! wp db check --allow-root 2>/dev/null; then
+    echo "WARNING: Cannot connect to database. Skipping plugin installation."
+    echo "Plugins can be installed later from WordPress admin."
+    return 0
+  fi
+
   echo "Installing action-scheduler ..."
-  wp plugin install action-scheduler --force --activate --path=/var/www/html --allow-root || true
+  wp plugin install action-scheduler --force --activate --path=/var/www/html --allow-root || echo "Warning: action-scheduler installation failed"
 
   echo "Installing litespeed-cache ..."
-  wp plugin install litespeed-cache --force --activate --path=/var/www/html --allow-root || true
+  wp plugin install litespeed-cache --force --activate --path=/var/www/html --allow-root || echo "Warning: litespeed-cache installation failed"
 
   echo "Installing regenerate-thumbnails ..."
-  wp plugin install regenerate-thumbnails --force --activate --path=/var/www/html --allow-root || true
+  wp plugin install regenerate-thumbnails --force --activate --path=/var/www/html --allow-root || echo "Warning: regenerate-thumbnails installation failed"
 }
 
 # Trap signals
