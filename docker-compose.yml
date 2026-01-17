@@ -19,7 +19,11 @@ services:
       - WP_MULTISITE=FALSE  # Pre-populates as FALSE; user can override to TRUE
     # Optional: Add healthcheck here if not in Dockerfile
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
+      test:
+        - CMD
+        - curl
+        - '-f'
+        - 'http://127.0.0.1:80'
       interval: 2s
       timeout: 10s
       retries: 15
