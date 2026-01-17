@@ -218,11 +218,11 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 ENV PATH="/usr/local/lsws/bin:${PATH}"
 
 # REMOVED DUPLICATE EXPOSE - Only expose port 80 for HTTP
-EXPOSE 80
+EXPOSE "80/tcp"
 
 # REMOVED: Old EXPOSE lines that were duplicated
 # Keep admin port separate if needed
-EXPOSE 7080
+EXPOSE "7080/tcp"
 
 # Improved healthcheck - checks localhost via HTTP
 HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=5 \
