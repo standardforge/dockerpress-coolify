@@ -10,18 +10,18 @@ function finish() {
 
 function update_wp_config() {
   echo "Updating wp-config.php ..."
-  wp config set WP_SITEURL "https://$COOLIFY_FQDN" --add --type=constant
-  wp config set WP_HOME "https://$COOLIFY_FQDN" --add --type=constant
-  wp config set DB_NAME $WORDPRESS_DB_NAME --add --type=constant
-  wp config set DB_USER $WORDPRESS_DB_USER --add --type=constant
-  wp config set DB_PASSWORD $WORDPRESS_DB_PASSWORD --add --type=constant
-  wp config set DB_HOST "$WORDPRESS_DB_HOST" --add --type=constant
-  wp config set DB_PREFIX $WORDPRESS_DB_PREFIX --add --type=constant
-  wp config set DB_PORT $WORDPRESS_DB_PORT --raw --add --type=constant
-  wp config set WP_DEBUG $WP_DEBUG --raw --add --type=constant
-  wp config set WP_MEMORY_LIMIT 512M --add --type=constant
-  wp config set WP_MAX_MEMORY_LIMIT 512M --add --type=constant
-  wp config set DISABLE_WP_CRON $DISABLE_WP_CRON --raw --add --type=constant
+  wp config set WP_SITEURL "https://$COOLIFY_FQDN" --type=constant
+  wp config set WP_HOME "https://$COOLIFY_FQDN" --type=constant
+  wp config set DB_NAME $WORDPRESS_DB_NAME --type=constant
+  wp config set DB_USER $WORDPRESS_DB_USER --type=constant
+  wp config set DB_PASSWORD $WORDPRESS_DB_PASSWORD --type=constant
+  wp config set DB_HOST "$WORDPRESS_DB_HOST" --type=constant
+  wp config set DB_PREFIX $WORDPRESS_DB_PREFIX --type=constant
+  wp config set DB_PORT $WORDPRESS_DB_PORT --raw --type=constant
+  wp config set WP_DEBUG $WP_DEBUG --raw --type=constant
+  wp config set WP_MEMORY_LIMIT 512M --type=constant
+  wp config set WP_MAX_MEMORY_LIMIT 512M --type=constant
+  wp config set DISABLE_WP_CRON $DISABLE_WP_CRON --raw --type=constant
 }
 
 function generate_litespeed_password() {
@@ -67,10 +67,10 @@ function install_wp_cli() {
   chmod +x /var/www/wp-cli.phar
   rm -rf /var/www/wp-completion.bash
   curl -o /var/www/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
-  # Removed source (useless here)
+  # Removed source (useless)
 }
 
-# Replaced sed with cat for security (no special char issues)
+# Replaced sed with cat (secure, no delimiter issues)
 function setup_mysql_optimize() {
   echo "Setting up MySQL Optimize..."
   : "${WORDPRESS_DB_HOST?Missing WORDPRESS_DB_HOST}"
@@ -218,7 +218,7 @@ cat '/usr/local/lsws/adminpasswd'
 tail -f \
   '/var/log/litespeed/access.log' &
 
-# Start the LiteSpeed (at end to avoid potential blocking)
+# Start the LiteSpeed (at end)
  /usr/local/lsws/bin/litespeed
 
 exec "$@"
