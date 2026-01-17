@@ -55,10 +55,10 @@ chmod 600 /root/.my.cnf  # Secure permissions
 function install_wp_cli() {
   echo "Setting up wp-cli..."
   rm -rf /var/www/.wp-cli/
-  WP_CLI_CACHE_DIR="${WP_CLI_CACHE_DIR:-/var/www/.wp-cli/cache/}"  # Default if unset
+  WP_CLI_CACHE_DIR="${WP_CLI_CACHE_DIR:-/var/www/.wp-cli/cache/}"
   mkdir -p "$WP_CLI_CACHE_DIR"
   chown -R www-data:www-data "$WP_CLI_CACHE_DIR"
-  WP_CLI_PACKAGES_DIR="${WP_CLI_PACKAGES_DIR:-/var/www/.wp-cli/packages/}"  # Default if unset
+  WP_CLI_PACKAGES_DIR="${WP_CLI_PACKAGES_DIR:-/var/www/.wp-cli/packages/}"
   rm -rf "$WP_CLI_PACKAGES_DIR"
   mkdir -p "$WP_CLI_PACKAGES_DIR"
   chown -R www-data:www-data "$WP_CLI_PACKAGES_DIR"
@@ -67,7 +67,7 @@ function install_wp_cli() {
   chmod +x /var/www/wp-cli.phar
   rm -rf /var/www/wp-completion.bash
   curl -o /var/www/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
-  # Removed source
+  # Removed source (useless)
 }
 
 # Replaced sed with cat (secure, no delimiter issues)
