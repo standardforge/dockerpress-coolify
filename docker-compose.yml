@@ -33,5 +33,10 @@ services:
     volumes:
       - wp-data:/var/www/html
     restart: unless-stopped
+
+networks:
+  coolify:
+    external: true
+
 volumes:
   wp-data:
