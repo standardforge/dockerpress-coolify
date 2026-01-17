@@ -55,8 +55,10 @@ chmod 600 /root/.my.cnf  # Secure permissions
 function install_wp_cli() {
   echo "Setting up wp-cli..."
   rm -rf /var/www/.wp-cli/
+  : "${WP_CLI_CACHE_DIR?Missing WP_CLI_CACHE_DIR}"
   mkdir -p $WP_CLI_CACHE_DIR
   chown -R www-data:www-data $WP_CLI_CACHE_DIR
+  : "${WP_CLI_PACKAGES_DIR?Missing WP_CLI_PACKAGES_DIR}"
   rm -rf $WP_CLI_PACKAGES_DIR
   mkdir -p $WP_CLI_PACKAGES_DIR
   chown -R www-data:www-data $WP_CLI_PACKAGES_DIR
@@ -65,16 +67,24 @@ function install_wp_cli() {
   chmod +x /var/www/wp-cli.phar
   rm -rf /var/www/wp-completion.bash
   curl -o /var/www/wp-completion.bash https://raw.githubusercontent.com/wp-cli/wp-cli/master/utils/wp-completion.bash
-  # Removed: source /var/www/wp-completion.bash (useless in script)
+  # Removed source (useless here)
 }
 
+# Replaced sed with cat for security (no special char issues)
 function setup_mysql_optimize() {
   echo "Setting up MySQL Optimize..."
-  sed -i -e "s/WORDPRESS_DB_HOST/$WORDPRESS_DB_HOST/g" /usr/local/bin/mysql-optimize
-  sed -i -e "s/WORDPRESS_DB_USER/$WORDPRESS_DB_USER/g" /usr/local/bin/mysql-optimize
-  sed -i -e "s/WORDPRESS_DB_PASSWORD/$WORDPRESS_DB_PASSWORD/g" /usr/local/bin/mysql-optimize
-  sed -i -e "s/WORDPRESS_DB_NAME/$WORDPRESS_DB_NAME/g" /usr/local/bin/mysql-optimize
-  sed -i -e "s/WORDPRESS_DB_PORT/$WORDPRESS_DB_PORT/g" /usr/local/bin/mysql-optimize
+  : "${WORDPRESS_DB_HOST?Missing WORDPRESS_DB_HOST}"
+  : "${WORDPRESS_DB_USER?Missing WORDPRESS_DB_USER}"
+  : "${WORDPRESS_DB_PASSWORD?Missing WORDPRESS_DB_PASSWORD}"
+  : "${WORDPRESS_DB_NAME?Missing WORDPRESS_DB_NAME}"
+  : "${WORDPRESS_DB_PORT?Missing WORDPRESS_DB_PORT}"
+
+  cat <<EOF > /usr/local/bin/mysql-optimize
+#!/bin/bash
+mysqlcheck -h $WORDPRESS_DB_HOST -u $WORDPRESS_DB_USER -p'$WORDPRESS_DB_PASSWORD' -P $WORDPRESS_DB_PORT --optimize $WORDPRESS_DB_NAME
+EOF
+
+  chmod +x /usr/local/bin/mysql-optimize
 }
 
 function create_wordpress_database() {
@@ -204,11 +214,11 @@ sysvbanner dockerpress
 # Read the credentials
 cat '/usr/local/lsws/adminpasswd'
 
-# Start the LiteSpeed (moved to end to avoid blocking)
- /usr/local/lsws/bin/litespeed
-
 # Tail the logs to stdout
 tail -f \
-  '/var/log/litespeed/access.log'
+  '/var/log/litespeed/access.log' &
+
+# Start the LiteSpeed (at end to avoid potential blocking)
+ /usr/local/lsws/bin/litespeed
 
 exec "$@"
