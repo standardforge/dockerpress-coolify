@@ -20,9 +20,9 @@ services:
     # Optional: Add healthcheck here if not in Dockerfile
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
-      interval: 30s
+      interval: 2s
       timeout: 10s
-      retries: 3
+      retries: 15
       start_period: 30s
     # Volumes for persistence (e.g., WordPress files, if not already handled)
     volumes:
