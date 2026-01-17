@@ -18,21 +18,18 @@ services:
       - WP_LOCALE=en_US
       - WP_DEBUG=false
       - WP_MULTISITE=FALSE  # Pre-populates as FALSE; user can override to TRUE
-    labels:
-      - "traefik.http.services.dockerpress.loadbalancer.server.port=80"  # Add this line
+    expose:
+      - "80"  # Expose port internally to the Docker network
     # Optional: Add healthcheck here if not in Dockerfile
-    #healthcheck:
-    #  test:
-    #    - CMD
-    #    - curl
-    #    - '-f'
-    #    - 'http://127.0.0.1:80'
-    #  interval: 2s
-    #  timeout: 10s
-    #  retries: 15
-    #  start_period: 30s
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:80 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     # Volumes for persistence (e.g., WordPress files, if not already handled)
     volumes:
       - wp-data:/var/www/html
+    restart: unless-stopped
 volumes:
   wp-data:
