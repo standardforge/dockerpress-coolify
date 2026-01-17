@@ -3,8 +3,8 @@ services:
   dockerpress:
     build:
       context: .  # Builds from the current directory using your Dockerfile
-    #ports:  # Comment out or remove this line and the mapping below
-    #  - "80:80"  # Expose OpenLiteSpeed/WordPress (adjust if needed)
+    ports:  # Comment out or remove this line and the mapping below
+      - "80:80"  # Expose OpenLiteSpeed/WordPress (adjust if needed)
     environment:
       - WORDPRESS_DB_HOST  # Required; user sets in UI
       - WORDPRESS_DB_PORT=3306
