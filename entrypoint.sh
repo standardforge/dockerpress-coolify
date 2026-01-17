@@ -13,8 +13,8 @@ function finish() {
 
 function update_wp_config() {
   echo "Updating wp-config.php ..."
-  wp config set WP_SITEURL "$SERVICE_URL_DOCKERPRESS" --add --type=constant --allow-root
-  wp config set WP_HOME "$SERVICE_URL_DOCKERPRESS" --add --type=constant --allow-root
+  wp config set WP_SITEURL "$COOLIFY_URL" --add --type=constant --allow-root
+  wp config set WP_HOME "$COOLIFY_URL" --add --type=constant --allow-root
   wp config set DB_NAME "$WORDPRESS_DB_NAME" --add --type=constant --allow-root
   wp config set DB_USER "$WORDPRESS_DB_USER" --add --type=constant --allow-root
   wp config set DB_PASSWORD "$WORDPRESS_DB_PASSWORD" --add --type=constant --allow-root
@@ -123,12 +123,12 @@ function install_wordpress() {
 
     # if Wordpress is installed
     if ! wp core is-installed --allow-root; then
-      echo "Installing WordPress for $SERVICE_URL_DOCKERPRESS ..."
+      echo "Installing WordPress for $COOLIFY_URL ..."
       if [ "${WP_MULTISITE:-false}" = "true" ]; then
         echo "define('WP_ALLOW_MULTISITE', true);" >> /var/www/html/wp-config.php
-        wp core multisite-install --url="$SERVICE_URL_DOCKERPRESS" --title="WordPress" --admin_user="$ADMIN_USER" --admin_password="$ADMIN_PASS" --admin_email="$ADMIN_EMAIL" --subdomains="${WP_SUBDOMAINS:-false}" --skip-email --path=/var/www/html --allow-root
+        wp core multisite-install --url="$COOLIFY_URL" --title="WordPress" --admin_user="$ADMIN_USER" --admin_password="$ADMIN_PASS" --admin_email="$ADMIN_EMAIL" --subdomains="${WP_SUBDOMAINS:-false}" --skip-email --path=/var/www/html --allow-root
       else
-        wp core install --url="$SERVICE_URL_DOCKERPRESS" \
+        wp core install --url="$COOLIFY_URL" \
           --title="WordPress" \
           --admin_user="$ADMIN_USER" \
           --admin_password="$ADMIN_PASS" \
