@@ -6,6 +6,7 @@ rm -f /var/www/html/index.html
 function finish() {
   /usr/local/lsws/bin/lswsctrl "stop"
   pkill "tail"
+  exit 0
 }
 
 function update_wp_config() {
@@ -68,6 +69,12 @@ function setup_mysql_optimize() {
 }
 
 function create_wordpress_database() {
+  echo "Waiting for database to be ready..."
+  until mysql --no-defaults -h $WORDPRESS_DB_HOST --port $WORDPRESS_DB_PORT -u $WORDPRESS_DB_USER -p$WORDPRESS_DB_PASSWORD -e "SELECT 1" >/dev/null 2>&1; do
+    echo "Database not ready, waiting..."
+    sleep 2
+  done
+  
   if [ -n "$MYSQL_ROOT_PASSWORD" ]; then
     echo "Try create Database if not exists using root ..."
     mysql --no-defaults -h $WORDPRESS_DB_HOST --port $WORDPRESS_DB_PORT -u root -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $WORDPRESS_DB_NAME;"
@@ -159,7 +166,7 @@ cd /var/www/html
 # Generate litespeed Admin Password
 generate_litespeed_password
 
-trap finish SIGTERM
+trap finish SIGTERM SIGINT
 
 #### Setting Up MySQL Client Defaults
 setup_mysql_client
@@ -191,17 +198,32 @@ wp core verify-checksums
 # start memcache service
 service memcached start
 
-# Start the LiteSpeed
-/usr/local/lsws/bin/litespeed
-
 # welcome to dockerpress
 sysvbanner dockerpress
 
 # Read the credentials
 cat '/usr/local/lsws/adminpasswd'
 
-# Tail the logs to stdout
-tail -f \
-  '/var/log/litespeed/access.log'
+# CRITICAL FIX: Start OpenLiteSpeed properly
+echo "Starting OpenLiteSpeed..."
+/usr/local/lsws/bin/lswsctrl start
 
-exec "$@"
+# Wait a moment for the server to start
+sleep 2
+
+# Verify it's running
+if pgrep -x "litespeed" > /dev/null; then
+    echo "OpenLiteSpeed started successfully"
+else
+    echo "ERROR: OpenLiteSpeed failed to start"
+    cat /var/log/litespeed/error.log
+    exit 1
+fi
+
+# Tail the logs to stdout (keeps container running)
+tail -f \
+  '/var/log/litespeed/access.log' \
+  '/var/log/litespeed/error.log' &
+
+# Wait indefinitely
+wait
